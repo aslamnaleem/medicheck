@@ -1,0 +1,1134 @@
+import React, { useState } from 'react';
+import { Pill, Info, Clock, User, Calendar, Bell, Edit, Settings, Check, Gift, LogOut, Trash2, AlertTriangle, Send, ChevronLeft, Phone, MapPin, Droplet, Cake } from 'lucide-react';
+
+export default function MedicineTracker() {
+  // Authentication state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginForm, setLoginForm] = useState({
+    username: '',
+    password: ''
+  });
+  const [loginError, setLoginError] = useState('');
+  
+  // Handle login
+  const handleLogin = (e) => {
+    e.preventDefault();
+    
+    if (loginForm.username === 'jasmine' && loginForm.password === 'denise') {
+      setIsLoggedIn(true);
+      setLoginError('');
+    } else {
+      setLoginError('Invalid username or password');
+      setLoginForm({ username: '', password: '' });
+    }
+  };
+  
+  // Handle logout
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setActiveTab('home');
+    setShowAccountDetails(false);
+    setLoginForm({ username: '', password: '' });
+  };
+  
+  const [medicines, setMedicines] = useState([]);
+  const [activeTab, setActiveTab] = useState('home');
+  const [showAccountDetails, setShowAccountDetails] = useState(false);
+  
+  // Calendar state
+  const [currentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
+  const [appointments, setAppointments] = useState([]);
+  
+  // Appointment form state
+  const [appointmentForm, setAppointmentForm] = useState({
+    type: 'Check Up',
+    date: '',
+    time: '',
+    comments: ''
+  });
+  
+  // Handle appointment form submission
+  const handleSetAppointment = (e) => {
+    e.preventDefault();
+    
+    if (!appointmentForm.date || !appointmentForm.time) {
+      alert('Please select both date and time');
+      return;
+    }
+    
+    const newAppointment = {
+      id: Date.now(),
+      type: appointmentForm.type,
+      date: appointmentForm.date,
+      time: appointmentForm.time,
+      comments: appointmentForm.comments
+    };
+    
+    setAppointments(prev => [...prev, newAppointment]);
+    
+    // Reset form
+    setAppointmentForm({
+      type: 'Check Up',
+      date: '',
+      time: '',
+      comments: ''
+    });
+    
+    setShowAppointmentForm(false);
+    
+    // Switch view to the Bell tab
+    setActiveTab('bell');
+  };
+  
+  // Get calendar data
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    return { daysInMonth, startingDayOfWeek, year, month };
+  };
+  
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  
+  const isSameDay = (date1, date2) => {
+    return date1.getDate() === date2.getDate() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getFullYear() === date2.getFullYear();
+  };
+  
+  // Demo user data
+  const demoUser = {
+    name: 'John Anderson',
+    dateOfBirth: '15 March 1985',
+    phoneNumber: '+1 (555) 123-4567',
+    bloodType: 'O+',
+    city: 'San Francisco, CA'
+  };
+  const [formData, setFormData] = useState({
+    name: '',
+    dosage: '',
+    lastTaken: '',
+    nextDue: '',
+    instruction: '',
+    color: 'red'
+  });
+  
+  // Common medicine database for search
+  const medicineDatabase = [
+    'Allopurinol', 'Eltroxin', 'Ibuprofen', 'Paracetamol', 'Aspirin',
+    'Metformin', 'Lisinopril', 'Levothyroxine', 'Atorvastatin', 'Amlodipine',
+    'Omeprazole', 'Simvastatin', 'Losartan', 'Gabapentin', 'Hydrochlorothiazide'
+  ];
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  
+  // Filter medicines based on search
+  const filteredMedicines = medicineDatabase.filter(med =>
+    med.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Handle medicine search
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setFormData(prev => ({
+      ...prev,
+      name: e.target.value
+    }));
+    setShowSuggestions(true);
+  };
+  
+  // Select medicine from suggestions
+  const selectMedicine = (medicineName) => {
+    setSearchTerm(medicineName);
+    setFormData(prev => ({
+      ...prev,
+      name: medicineName
+    }));
+    setShowSuggestions(false);
+  };
+  
+  // Add new medicine
+  const handleAddMedicine = (e) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.dosage) {
+      alert('Please fill in at least Medicine Name and Dosage');
+      return;
+    }
+    
+    const newMedicine = {
+      id: Date.now(),
+      ...formData
+    };
+    
+    setMedicines(prev => [...prev, newMedicine]);
+    
+    // Reset form
+    setFormData({
+      name: '',
+      dosage: '',
+      lastTaken: '',
+      nextDue: '',
+      instruction: '',
+      color: 'red'
+    });
+    setSearchTerm('');
+    
+    // Switch to home tab to see the new medicine
+    setActiveTab('home');
+  };
+  
+  // Delete medicine
+  const deleteMedicine = (id) => {
+    setMedicines(prev => prev.filter(med => med.id !== id));
+  };
+  
+  // Mark medicine as taken (with animation)
+  const [completingId, setCompletingId] = useState(null);
+  
+  const markAsTaken = (id) => {
+    setCompletingId(id);
+    // Wait for animation then remove
+    setTimeout(() => {
+      deleteMedicine(id);
+      setCompletingId(null);
+    }, 500);
+  };
+  
+  // Mark appointment as complete (with animation)
+  const [completingAppointmentId, setCompletingAppointmentId] = useState(null);
+  
+  const markAppointmentComplete = (id) => {
+    setCompletingAppointmentId(id);
+    // Wait for animation then remove
+    setTimeout(() => {
+      setAppointments(prev => prev.filter(apt => apt.id !== id));
+      setCompletingAppointmentId(null);
+    }, 500);
+  };
+
+  const colorClasses = {
+    red: 'border-l-red-600 bg-red-50',
+    orange: 'border-l-orange-500 bg-orange-50',
+    brown: 'border-l-amber-700 bg-amber-50'
+  };
+
+  const colorTextClasses = {
+    red: 'text-red-600',
+    orange: 'text-orange-500',
+    brown: 'text-amber-700'
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      {!isLoggedIn ? (
+        /* Login Page */
+        <div className="w-full max-w-md bg-gradient-to-b from-red-600 to-red-700 rounded-3xl shadow-2xl overflow-hidden p-8" style={{ minHeight: '600px' }}>
+          <div className="flex flex-col items-center justify-center h-full">
+            {/* Logo - MediCheck Text */}
+            <div className="mb-12 text-center">
+              <h1 className="text-6xl font-black text-white mb-2 tracking-tight">
+                Medi<span className="text-red-200">Check</span>
+              </h1>
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <div className="h-1 w-12 bg-white rounded-full"></div>
+                <Pill className="w-6 h-6 text-white" />
+                <div className="h-1 w-12 bg-white rounded-full"></div>
+              </div>
+              <p className="text-white text-sm mt-4 font-light tracking-wide opacity-90">
+                Your Personal Medicine Tracker
+              </p>
+            </div>
+
+            {/* Login Form */}
+            <form onSubmit={handleLogin} className="w-full space-y-4">
+              {/* Username */}
+              <div>
+                <input
+                  type="text"
+                  value={loginForm.username}
+                  onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                  placeholder="Username"
+                  className="w-full px-6 py-4 rounded-full text-gray-700 font-medium focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+                  required
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <input
+                  type="password"
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Password"
+                  className="w-full px-6 py-4 rounded-full text-gray-700 font-medium focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+                  required
+                />
+              </div>
+
+              {/* Error Message */}
+              {loginError && (
+                <div className="text-white text-center text-sm font-semibold bg-red-800 bg-opacity-50 py-2 rounded-full">
+                  {loginError}
+                </div>
+              )}
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                className="w-full bg-white text-red-600 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg"
+              >
+                Login
+              </button>
+            </form>
+
+            {/* Demo Info */}
+            <div className="mt-8 text-center">
+              <p className="text-white text-xs opacity-75">Demo Credentials:</p>
+              <p className="text-white text-xs font-semibold">Username: jasmine | Password: denise</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Main App */
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden" style={{ minHeight: '600px', maxHeight: '90vh' }}>
+        {/* Header */}
+        <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-6">
+          <h1 className="text-2xl font-bold tracking-wide">MEDICINE TRACKER</h1>
+        </div>
+
+        {/* Content Area */}
+        <div className="overflow-y-auto" style={{ height: 'calc(90vh - 180px)', maxHeight: '500px' }}>
+          {/* Home/Clock Tab - Medicine List */}
+          {activeTab === 'home' && (
+            <div className="p-6">
+              {/* Section Header */}
+              <div className="flex items-center gap-2 mb-6">
+                <Pill className="w-8 h-8 text-red-600" />
+                <h2 className="text-2xl font-bold text-gray-800">Medicines</h2>
+              </div>
+
+              {/* Medicine Cards */}
+              {medicines.length === 0 ? (
+                <div className="text-center py-12">
+                  <Pill className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 text-lg">No medicines added yet</p>
+                  <p className="text-gray-400 text-sm mt-2">Click the Edit icon below to add your first medicine</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {medicines.map((medicine) => (
+                    <div
+                      key={medicine.id}
+                      className={`border-l-8 ${colorClasses[medicine.color]} rounded-lg p-4 shadow-sm transition-all duration-500 ${
+                        completingId === medicine.id ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Check Circle Button */}
+                        <button
+                          onClick={() => markAsTaken(medicine.id)}
+                          className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                            completingId === medicine.id
+                              ? `${colorTextClasses[medicine.color]} border-current bg-current`
+                              : `${colorTextClasses[medicine.color]} border-current hover:bg-current hover:bg-opacity-10`
+                          }`}
+                        >
+                          {completingId === medicine.id && (
+                            <Check className="w-5 h-5 text-white" />
+                          )}
+                        </button>
+
+                        {/* Medicine Info */}
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-3">
+                            <h3 className={`text-xl font-bold ${colorTextClasses[medicine.color]}`}>
+                              {medicine.name}
+                            </h3>
+                            <button className="text-gray-400 hover:text-gray-600">
+                              <Info className="w-5 h-5" />
+                            </button>
+                          </div>
+
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600 font-semibold">Dosage</span>
+                              <span className="text-gray-800 font-medium">{medicine.dosage}</span>
+                            </div>
+                            {medicine.lastTaken && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 font-semibold">Last Taken</span>
+                                <span className="text-gray-800">{medicine.lastTaken}</span>
+                              </div>
+                            )}
+                            {medicine.nextDue && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 font-semibold">Next Due</span>
+                                <span className="text-gray-800">{medicine.nextDue}</span>
+                              </div>
+                            )}
+                            {medicine.instruction && (
+                              <div className="flex justify-between">
+                                <span className="text-gray-600 font-semibold">Instruction</span>
+                                <span className="text-gray-800">{medicine.instruction}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Edit Tab - Add Medicine Form */}
+          {activeTab === 'edit' && (
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Edit className="w-8 h-8 text-red-600" />
+                <h2 className="text-2xl font-bold text-gray-800">Add Medicine</h2>
+              </div>
+
+              <form onSubmit={handleAddMedicine} className="space-y-4">
+                {/* Medicine Name Search */}
+                <div className="relative">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Medicine Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    onFocus={() => setShowSuggestions(true)}
+                    placeholder="Search or type medicine name..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    required
+                  />
+                  
+                  {/* Suggestions Dropdown */}
+                  {showSuggestions && searchTerm && filteredMedicines.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredMedicines.map((med, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => selectMedicine(med)}
+                          className="w-full text-left px-4 py-2 hover:bg-red-50 text-gray-800"
+                        >
+                          {med}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Dosage */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Dosage *
+                  </label>
+                  <input
+                    type="text"
+                    name="dosage"
+                    value={formData.dosage}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 100mg, 2 tablets"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                {/* Last Taken */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Last Taken
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="date"
+                      name="lastTakenDate"
+                      onChange={(e) => {
+                        const date = e.target.value;
+                        const time = formData.lastTaken?.split(' ')[1] || '';
+                        setFormData(prev => ({
+                          ...prev,
+                          lastTaken: time ? `${date} ${time}` : date
+                        }));
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                    <input
+                      type="time"
+                      name="lastTakenTime"
+                      onChange={(e) => {
+                        const time = e.target.value;
+                        const date = formData.lastTaken?.split(' ')[0] || new Date().toISOString().split('T')[0];
+                        setFormData(prev => ({
+                          ...prev,
+                          lastTaken: `${date} ${time}`
+                        }));
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Select date and time</p>
+                </div>
+
+                {/* Next Due */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Next Due
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="date"
+                      name="nextDueDate"
+                      onChange={(e) => {
+                        const date = e.target.value;
+                        const time = formData.nextDue?.split(' ')[1] || '';
+                        setFormData(prev => ({
+                          ...prev,
+                          nextDue: time ? `${date} ${time}` : date
+                        }));
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                    <input
+                      type="time"
+                      name="nextDueTime"
+                      onChange={(e) => {
+                        const time = e.target.value;
+                        const date = formData.nextDue?.split(' ')[0] || new Date().toISOString().split('T')[0];
+                        setFormData(prev => ({
+                          ...prev,
+                          nextDue: `${date} ${time}`
+                        }));
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Select date and time</p>
+                </div>
+
+                {/* Instruction */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Instruction
+                  </label>
+                  <input
+                    type="text"
+                    name="instruction"
+                    value={formData.instruction}
+                    onChange={handleInputChange}
+                    placeholder="e.g., Take with food"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Color Selection */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Card Color
+                  </label>
+                  <select
+                    name="color"
+                    value={formData.color}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="red">Red</option>
+                    <option value="orange">Orange</option>
+                    <option value="brown">Brown</option>
+                  </select>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                >
+                  Add Medicine
+                </button>
+              </form>
+
+              {/* List of Added Medicines with Delete */}
+              {medicines.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">Your Medicines</h3>
+                  <div className="space-y-2">
+                    {medicines.map((medicine) => (
+                      <div
+                        key={medicine.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div>
+                          <span className="font-semibold text-gray-800">{medicine.name}</span>
+                          <span className="text-gray-600 text-sm ml-2">({medicine.dosage})</span>
+                        </div>
+                        <button
+                          onClick={() => deleteMedicine(medicine.id)}
+                          className="text-red-600 hover:text-red-800 text-sm font-semibold"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Settings Tab */}
+          {activeTab === 'settings' && !showAccountDetails && (
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Settings className="w-8 h-8 text-red-600" />
+                <h2 className="text-2xl font-bold text-gray-800">Settings</h2>
+              </div>
+
+              {/* General Section */}
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-500 mb-3 px-2">General</h3>
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <button 
+                    onClick={() => setShowAccountDetails(true)}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                  >
+                    <User className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Account</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100">
+                    <Bell className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Notifications</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100">
+                    <Gift className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Coupons</span>
+                  </button>
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                  >
+                    <LogOut className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Log out</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                    <Trash2 className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Delete account</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Feedback Section */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-500 mb-3 px-2">Feedback</h3>
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100">
+                    <AlertTriangle className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Report a bug</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                    <Send className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Send feedback</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Account Details Page */}
+          {activeTab === 'settings' && showAccountDetails && (
+            <div className="p-6">
+              {/* Back Button and Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <button 
+                  onClick={() => setShowAccountDetails(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6 text-gray-600" />
+                </button>
+                <h2 className="text-2xl font-bold text-gray-800">Account</h2>
+              </div>
+
+              {/* Profile Picture */}
+              <div className="flex justify-center mb-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+                  <User className="w-12 h-12 text-white" />
+                </div>
+              </div>
+
+              {/* User Information Cards */}
+              <div className="space-y-4">
+                {/* Name */}
+                <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-red-500">
+                  <div className="flex items-center gap-3">
+                    <User className="w-5 h-5 text-red-600" />
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-500 font-semibold mb-1">Full Name</p>
+                      <p className="text-gray-800 font-medium">{demoUser.name}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Date of Birth */}
+                <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-orange-500">
+                  <div className="flex items-center gap-3">
+                    <Cake className="w-5 h-5 text-orange-600" />
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-500 font-semibold mb-1">Date of Birth</p>
+                      <p className="text-gray-800 font-medium">{demoUser.dateOfBirth}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone Number */}
+                <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-blue-600" />
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-500 font-semibold mb-1">Phone Number</p>
+                      <p className="text-gray-800 font-medium">{demoUser.phoneNumber}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Blood Type */}
+                <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-red-600">
+                  <div className="flex items-center gap-3">
+                    <Droplet className="w-5 h-5 text-red-700" />
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-500 font-semibold mb-1">Blood Type</p>
+                      <p className="text-gray-800 font-medium">{demoUser.bloodType}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* City */}
+                <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
+                  <div className="flex items-center gap-3">
+                    <MapPin className="w-5 h-5 text-green-600" />
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-500 font-semibold mb-1">City</p>
+                      <p className="text-gray-800 font-medium">{demoUser.city}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Edit Profile Button */}
+              <button className="w-full mt-6 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                Edit Profile
+              </button>
+            </div>
+          )}
+
+          {/* Calendar Tab */}
+          {activeTab === 'calendar' && !showAppointmentForm && (
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Calendar className="w-8 h-8 text-red-600" />
+                <h2 className="text-2xl font-bold text-gray-800">Calendar</h2>
+              </div>
+
+              {/* Month and Year */}
+              <div className="text-center mb-4">
+                <h3 className="text-xl font-bold text-gray-800">
+                  {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+                </h3>
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+                {/* Day Names */}
+                <div className="grid grid-cols-7 gap-2 mb-2">
+                  {dayNames.map((day) => (
+                    <div key={day} className="text-center text-xs font-semibold text-gray-500 py-2">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Days */}
+                <div className="grid grid-cols-7 gap-2">
+                  {(() => {
+                    const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate);
+                    const days = [];
+                    
+                    // Empty cells for days before month starts
+                    for (let i = 0; i < startingDayOfWeek; i++) {
+                      days.push(
+                        <div key={`empty-${i}`} className="aspect-square" />
+                      );
+                    }
+                    
+                    // Days of the month
+                    for (let day = 1; day <= daysInMonth; day++) {
+                      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                      const isToday = isSameDay(date, new Date());
+                      
+                      days.push(
+                        <button
+                          key={day}
+                          onClick={() => setSelectedDate(date)}
+                          className={`aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all ${
+                            isToday
+                              ? 'bg-red-600 text-white shadow-lg scale-110'
+                              : isSameDay(date, selectedDate)
+                              ? 'bg-red-100 text-red-600'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      );
+                    }
+                    
+                    return days;
+                  })()}
+                </div>
+              </div>
+
+              {/* Set Appointment Reminder Button */}
+              <button 
+                onClick={() => setShowAppointmentForm(true)}
+                className="w-full bg-red-600 text-white py-4 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-md flex items-center justify-center gap-2"
+              >
+                <Bell className="w-5 h-5" />
+                Set Appointment Reminder
+              </button>
+
+              {/* Upcoming Appointments */}
+              {appointments.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3">Upcoming Appointments</h3>
+                  <div className="space-y-3">
+                    {appointments.map((apt) => (
+                      <div key={apt.id} className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-red-500">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="font-semibold text-gray-800">{apt.type}</span>
+                          <button
+                            onClick={() => setAppointments(prev => prev.filter(a => a.id !== apt.id))}
+                            className="text-red-600 text-sm font-medium"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          📅 {apt.date} at {apt.time}
+                        </p>
+                        {apt.comments && (
+                          <p className="text-sm text-gray-500 mt-2">💬 {apt.comments}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Selected Date Info */}
+              {selectedDate && !isSameDay(selectedDate, new Date()) && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg text-center">
+                  <p className="text-sm text-gray-600">Selected Date</p>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {selectedDate.toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Appointment Form */}
+          {activeTab === 'calendar' && showAppointmentForm && (
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <button 
+                  onClick={() => setShowAppointmentForm(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6 text-gray-600" />
+                </button>
+                <h2 className="text-2xl font-bold text-gray-800">Set Appointment</h2>
+              </div>
+
+              <form onSubmit={handleSetAppointment} className="space-y-5">
+                {/* Type */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Type *
+                  </label>
+                  <select
+                    value={appointmentForm.type}
+                    onChange={(e) => setAppointmentForm(prev => ({ ...prev, type: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-800 font-medium"
+                    required
+                  >
+                    <option value="Check Up">Check Up</option>
+                    <option value="Blood Test">Blood Test</option>
+                    <option value="CBG Test">CBG Test</option>
+                  </select>
+                </div>
+
+                {/* Date */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={appointmentForm.date}
+                    onChange={(e) => setAppointmentForm(prev => ({ ...prev, date: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                {/* Time */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Time *
+                  </label>
+                  <input
+                    type="time"
+                    value={appointmentForm.time}
+                    onChange={(e) => setAppointmentForm(prev => ({ ...prev, time: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                {/* Comments */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Comments
+                  </label>
+                  <textarea
+                    value={appointmentForm.comments}
+                    onChange={(e) => setAppointmentForm(prev => ({ ...prev, comments: e.target.value }))}
+                    placeholder="Add any additional notes or comments..."
+                    rows="4"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="w-full bg-red-600 text-white py-4 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-md"
+                >
+                  Set Appointment
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Bell/Notifications Tab */}
+          {activeTab === 'bell' && (
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Bell className="w-8 h-8 text-red-600" />
+                <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
+              </div>
+
+              {/* Appointment Reminders */}
+              {appointments.length === 0 ? (
+                <div className="text-center py-12">
+                  <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 text-lg">No appointment reminders</p>
+                  <p className="text-gray-400 text-sm mt-2">Set appointments in the Calendar tab</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-gray-500 mb-3">Appointment Reminders</h3>
+                  {appointments.map((apt) => {
+                    const appointmentDate = new Date(apt.date + 'T' + apt.time);
+                    const now = new Date();
+                    const isPast = appointmentDate < now;
+                    const isToday = apt.date === new Date().toISOString().split('T')[0];
+                    
+                    return (
+                      <div
+                        key={apt.id}
+                        className={`rounded-lg shadow-sm p-4 border-l-4 transition-all duration-500 ${
+                          completingAppointmentId === apt.id ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+                        } ${
+                          isPast
+                            ? 'bg-gray-50 border-gray-400'
+                            : isToday
+                            ? 'bg-red-50 border-red-600'
+                            : 'bg-white border-orange-500'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          {/* Check Circle Button */}
+                          <button
+                            onClick={() => markAppointmentComplete(apt.id)}
+                            className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                              completingAppointmentId === apt.id
+                                ? isPast
+                                  ? 'text-gray-600 border-gray-600 bg-gray-600'
+                                  : isToday
+                                  ? 'text-red-600 border-red-600 bg-red-600'
+                                  : 'text-orange-600 border-orange-600 bg-orange-600'
+                                : isPast
+                                ? 'text-gray-600 border-gray-600 hover:bg-gray-600 hover:bg-opacity-10'
+                                : isToday
+                                ? 'text-red-600 border-red-600 hover:bg-red-600 hover:bg-opacity-10'
+                                : 'text-orange-600 border-orange-600 hover:bg-orange-600 hover:bg-opacity-10'
+                            }`}
+                          >
+                            {completingAppointmentId === apt.id && (
+                              <Check className="w-5 h-5 text-white" />
+                            )}
+                          </button>
+
+                          {/* Appointment Info */}
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <h3 className={`text-lg font-bold ${
+                                  isPast ? 'text-gray-500' : isToday ? 'text-red-600' : 'text-gray-800'
+                                }`}>
+                                  {apt.type}
+                                </h3>
+                              </div>
+                              {isToday && (
+                                <span className="bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                  TODAY
+                                </span>
+                              )}
+                              {isPast && (
+                                <span className="bg-gray-400 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                  PAST
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="space-y-2 text-sm">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-700 font-medium">
+                                  {new Date(apt.date).toLocaleDateString('en-US', { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                  })}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-700 font-medium">{apt.time}</span>
+                              </div>
+                              {apt.comments && (
+                                <div className="flex items-start gap-2 mt-3 pt-3 border-t border-gray-200">
+                                  <Info className="w-4 h-4 text-gray-500 mt-0.5" />
+                                  <span className="text-gray-600">{apt.comments}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Other Tabs - Placeholder */}
+          {activeTab !== 'home' && activeTab !== 'edit' && activeTab !== 'settings' && activeTab !== 'calendar' && activeTab !== 'bell' && (
+            <div className="p-6 text-center">
+              <p className="text-gray-500 text-lg">Coming Soon!</p>
+              <p className="text-gray-400 text-sm mt-2">This feature is under development</p>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Navigation */}
+        <div className="bg-gradient-to-r from-red-600 to-red-700 p-4">
+          <div className="flex justify-around items-center">
+            <button
+              onClick={() => setActiveTab('home')}
+              className={`p-3 rounded-full transition-colors ${
+                activeTab === 'home' || activeTab === 'clock' ? 'bg-white/20' : 'hover:bg-white/10'
+              }`}
+            >
+              <Clock className="w-6 h-6 text-white" />
+            </button>
+            <button
+              onClick={() => setActiveTab('user')}
+              className={`p-3 rounded-full transition-colors ${
+                activeTab === 'user' ? 'bg-white/20' : 'hover:bg-white/10'
+              }`}
+            >
+              <User className="w-6 h-6 text-white" />
+            </button>
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`p-3 rounded-full transition-colors ${
+                activeTab === 'calendar' ? 'bg-white/20' : 'hover:bg-white/10'
+              }`}
+            >
+              <Calendar className="w-6 h-6 text-white" />
+            </button>
+            <button
+              onClick={() => setActiveTab('bell')}
+              className={`p-3 rounded-full transition-colors ${
+                activeTab === 'bell' ? 'bg-white/20' : 'hover:bg-white/10'
+              }`}
+            >
+              <Bell className="w-6 h-6 text-white" />
+            </button>
+            <button
+              onClick={() => setActiveTab('edit')}
+              className={`p-3 rounded-full transition-colors ${
+                activeTab === 'edit' ? 'bg-white/20' : 'hover:bg-white/10'
+              }`}
+            >
+              <Edit className="w-6 h-6 text-white" />
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`p-3 rounded-full transition-colors ${
+                activeTab === 'settings' ? 'bg-white/20' : 'hover:bg-white/10'
+              }`}
+            >
+              <Settings className="w-6 h-6 text-white" />
+            </button>
+          </div>
+        </div>
+              </div>
+      )}
+    </div>
+  );
+}
