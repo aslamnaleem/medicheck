@@ -10,7 +10,7 @@ const demoDoctors = [
     location: 'San Vicente, Biñan, Laguna',
     distance: '2 KM',
     wait: '10 Mins',
-    description: "Dr. Dela Cruz is a highly-rated pediatrician specializing in childhood vaccines, growth and development, and common pediatric illnesses. She completed her residency at Philippine General Hospital and is affiliated with St. Cabrini Medical Center.",
+    description: "Dr. Jasmine Dela Cruz is a highly-rated pediatrician specializing in childhood vaccines, growth and development, and common pediatric illnesses. She completed her residency at Philippine General Hospital and is affiliated with St. Cabrini Medical Center.",
     rating: 4.8
   },
   {
@@ -30,7 +30,7 @@ const demoDoctors = [
     location: 'Tubigan Road, Biñan, Laguna',
     distance: '4 KM',
     wait: '17 Mins',
-    description: "Dr. Denise Santos is a board-certified cardiologist with over 15 years of experience treating heart disease, hypertension, and cardiovascular conditions. She graduated from University of the Philippines College of Medicine and completed her cardiology fellowship at Texas Heart Institute.",
+    description: "Dr. Zambas Santos is a board-certified cardiologist with over 15 years of experience treating heart disease, hypertension, and cardiovascular conditions. She graduated from University of the Philippines College of Medicine and completed her cardiology fellowship at Texas Heart Institute.",
     rating: 4.7
   },
   {
@@ -40,7 +40,7 @@ const demoDoctors = [
     location: 'Santo Tomas, Biñan, Laguna',
     distance: '6 KM',
     wait: '28 Mins',
-    description: "Dr. Zambas Torres is a trusted family doctor providing comprehensive primary care for patients of all ages. She specializes in preventive medicine, chronic disease management, and routine health screenings. She is known for her compassionate bedside manner and thorough approach to patient care.",
+    description: "Dr. Zabala Torres is a trusted family doctor providing comprehensive primary care for patients of all ages. She specializes in preventive medicine, chronic disease management, and routine health screenings. She is known for her compassionate bedside manner and thorough approach to patient care.",
     rating: 4.6
   }
 ];
@@ -234,11 +234,55 @@ export default function MedicineTracker() {
   });
   
   // Common medicine database for search
-  const medicineDatabase = [
+const medicineDatabase = [
+    // Existing Medicines
     'Allopurinol', 'Eltroxin', 'Ibuprofen', 'Paracetamol', 'Aspirin',
     'Metformin', 'Lisinopril', 'Levothyroxine', 'Atorvastatin', 'Amlodipine',
-    'Omeprazole', 'Simvastatin', 'Losartan', 'Gabapentin', 'Hydrochlorothiazide'
-  ];
+    'Omeprazole', 'Simvastatin', 'Losartan', 'Gabapentin', 'Hydrochlorothiazide',
+    
+    // Cardiovascular Agents
+    'Atenolol', 'Metoprolol', 'Rosuvastatin', 'Pravastatin', 'Ezetimibe',
+    'Valsartan', 'Carvedilol', 'Clopidogrel', 'Warfarin', 'Rivaroxaban',
+    'Apixaban', 'Furosemide', 'Spironolactone', 'Triamterene', 'Diltiazem',
+    'Verapamil', 'Hydralazine', 'Ramipril', 'Enalapril', 'Benazepril',
+    'Telmisartan', 'Olmesartan', 'Digoxin', 'Amiodarone', 'Nitroglycerin',
+    'Isosorbide Mononitrate', 'Doxazosin', 'Nebivolol', 'Labetalol',
+    'Bisoprolol', 'Candesartan', 'Chlorthalidone',
+    
+    // Central Nervous System Agents
+    'Sertraline', 'Escitalopram', 'Fluoxetine', 'Bupropion', 'Trazodone',
+    'Citalopram', 'Venlafaxine', 'Duloxetine', 'Amitriptyline', 'Alprazolam',
+    'Clonazepam', 'Lorazepam', 'Diazepam', 'Zolpidem', 'Quetiapine',
+    'Aripiprazole', 'Risperidone', 'Lamotrigine', 'Topiramate', 'Pregabalin',
+    'Cyclobenzaprine', 'Tramadol', 'Oxycodone', 'Hydrocodone/Acetaminophen',
+    'Codeine/Acetaminophen', 'Meloxicam', 'Naproxen', 'Celecoxib',
+    'Methylphenidate', 'Lisdexamfetamine', 'Tizanidine', 'Baclofen',
+    'Hydroxyzine', 'Buspirone', 'Phenytoin', 'Divalproex', 'Lithium',
+    'Donepezil', 'Memantine',
+    
+    // Anti-infective Agents
+    'Amoxicillin', 'Azithromycin', 'Doxycycline', 'Cephalexin', 'Ciprofloxacin',
+    'Metronidazole', 'Trimethoprim/Sulfamethoxazole', 'Amoxicillin/Clavulanate',
+    'Clindamycin', 'Levofloxacin', 'Penicillin V Potassium', 'Mupirocin',
+    'Fluconazole', 'Valacyclovir', 'Acyclovir', 'Oseltamivir',
+    
+    // Respiratory and Allergy Agents
+    'Albuterol', 'Fluticasone', 'Montelukast', 'Cetirizine', 'Loratadine',
+    'Diphenhydramine', 'Fluticasone/Salmeterol', 'Budesonide/Formoterol',
+    'Ipratropium', 'Tiotropium', 'Theophylline',
+    
+    // Gastrointestinal Agents
+    'Pantoprazole', 'Esomeprazole', 'Ranitidine', 'Famotidine', 'Ondansetron',
+    'Promethazine', 'Lansoprazole', 'Metoclopramide', 'Dicyclomine',
+    'Lactulose', 'Polyethylene Glycol', 'Senna',
+    
+    // Endocrine and Metabolic Agents
+    'Glipizide', 'Glimepiride', 'Pioglitazone', 'Insulin Glargine', 'Insulin Lispro',
+    'Semaglutide', 'Dapagliflozin', 'Empagliflozin', 'Sitagliptin', 'Estradiol',
+    'Ethinyl Estradiol/Norethindrone', 'Conjugated Estrogen', 'Prednisone',
+    'Methylprednisolone', 'Alendronate', 'Folic Acid', 'Ergocalciferol',
+    'Potassium Chloride', 'Ferrous Sulfate', 'Finasteride', 'Tamsulosin'
+];
   
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -1347,7 +1391,7 @@ export default function MedicineTracker() {
                 />
                 
                 {/* User Location Pin (University of Perpetual Help System Laguna) - Center-right */}
-                <div className="absolute top-[45%] left-[58%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute top-[45%] left-[54%] transform -translate-x-1/2 -translate-y-1/2">
                   <div className="relative">
                     <MapPin className="w-8 h-8 text-blue-600 fill-blue-400 drop-shadow-lg" strokeWidth={2.5} />
                     <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded shadow-md whitespace-nowrap text-center">
