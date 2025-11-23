@@ -234,7 +234,7 @@ export default function MedicineTracker() {
   });
   
   // Common medicine database for search
-const medicineDatabase = [
+  const medicineDatabase = [
     // Existing Medicines
     'Allopurinol', 'Eltroxin', 'Ibuprofen', 'Paracetamol', 'Aspirin',
     'Metformin', 'Lisinopril', 'Levothyroxine', 'Atorvastatin', 'Amlodipine',
@@ -394,7 +394,7 @@ const medicineDatabase = [
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-red-600 to-red-700 flex items-center justify-center p-4">
       {!isLoggedIn ? (
         /* Login Page */
         <div className="w-full max-w-md bg-gradient-to-b from-red-600 to-red-700 rounded-3xl shadow-2xl overflow-hidden p-8" style={{ minHeight: '600px' }}>
@@ -1402,28 +1402,28 @@ const medicineDatabase = [
                 
                 {/* Doctor Pins - Scattered across Biñan/Laguna area */}
                 
-                {/* Near Central Mall Biñan (upper left) */}
+                {/* Dr. Maria Dela Cruz - Near Central Mall Biñan (upper left) */}
                 <div className="absolute top-[38%] left-[35%]">
                   <div className="relative group">
                     <MapPin className="w-6 h-6 text-red-600 fill-red-400 drop-shadow-md animate-pulse cursor-pointer" />
                   </div>
                 </div>
                 
-                {/* Calamba area (left side) */}
+                {/* Dr. John Smith - Calamba area (left side) */}
                 <div className="absolute top-[25%] left-[25%]">
                   <div className="relative group">
                     <MapPin className="w-6 h-6 text-red-600 fill-red-400 drop-shadow-md animate-pulse cursor-pointer" />
                   </div>
                 </div>
                 
-                {/* Near Plaza Rizal (upper right) */}
+                {/* Dr. Elena Santos - Near Plaza Rizal (upper right) */}
                 <div className="absolute top-[20%] left-[60%]">
                   <div className="relative group">
                     <MapPin className="w-6 h-6 text-red-600 fill-red-400 drop-shadow-md animate-pulse cursor-pointer" />
                   </div>
                 </div>
                 
-                {/* San Pedro/Zapote area (lower left) */}
+                {/* Dr. Rafael Torres - San Pedro/Zapote area (lower left) */}
                 <div className="absolute bottom-[30%] left-[20%]">
                   <div className="relative group">
                     <MapPin className="w-6 h-6 text-red-600 fill-red-400 drop-shadow-md animate-pulse cursor-pointer" />
