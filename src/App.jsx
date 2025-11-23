@@ -1,5 +1,49 @@
 import React, { useState } from 'react';
-import { Pill, Info, Clock, User, Calendar, Bell, Edit, Settings, Check, Gift, LogOut, Trash2, AlertTriangle, Send, ChevronLeft, Phone, MapPin, Droplet, Cake } from 'lucide-react';
+import { Pill, Info, Clock, User, Calendar, Bell, Edit, Settings, Check, Gift, LogOut, Trash2, AlertTriangle, Send, ChevronLeft, Phone, MapPin, Droplet, Cake, Star, Activity, Plus, X } from 'lucide-react';
+
+// Demo doctors data
+const demoDoctors = [
+  {
+    id: 1,
+    name: 'Dr. Jasmine Dela Cruz',
+    specialty: 'Pediatrician',
+    location: 'San Vicente, Biñan, Laguna',
+    distance: '2 KM',
+    wait: '10 Mins',
+    description: "Dr. Dela Cruz is a highly-rated pediatrician specializing in childhood vaccines, growth and development, and common pediatric illnesses. She completed her residency at Philippine General Hospital and is affiliated with St. Cabrini Medical Center.",
+    rating: 4.8
+  },
+  {
+    id: 2,
+    name: 'Dr. Denise Smith',
+    specialty: 'Endocrinologist',
+    location: 'Orchid Street, Biñan, Laguna',
+    distance: '5 KM',
+    wait: '20 Mins',
+    description: "Dr. Denise Smith is a renowned endocrinologist specializing in diabetes, metabolic disorders, and hormonal imbalances. She earned her medical degree from Harvard Medical School and completed her residency in internal medicine at Johns Hopkins Hospital, followed by a fellowship in endocrinology at the Mayo Clinic.",
+    rating: 4.9
+  },
+  {
+    id: 3,
+    name: 'Dr. Zambas Santos',
+    specialty: 'Cardiologist',
+    location: 'Tubigan Road, Biñan, Laguna',
+    distance: '4 KM',
+    wait: '17 Mins',
+    description: "Dr. Denise Santos is a board-certified cardiologist with over 15 years of experience treating heart disease, hypertension, and cardiovascular conditions. She graduated from University of the Philippines College of Medicine and completed her cardiology fellowship at Texas Heart Institute.",
+    rating: 4.7
+  },
+  {
+    id: 4,
+    name: 'Dr. Zabala Torres',
+    specialty: 'General Practitioner',
+    location: 'Santo Tomas, Biñan, Laguna',
+    distance: '6 KM',
+    wait: '28 Mins',
+    description: "Dr. Zambas Torres is a trusted family doctor providing comprehensive primary care for patients of all ages. She specializes in preventive medicine, chronic disease management, and routine health screenings. She is known for her compassionate bedside manner and thorough approach to patient care.",
+    rating: 4.6
+  }
+];
 
 export default function MedicineTracker() {
   // Authentication state
@@ -34,6 +78,63 @@ export default function MedicineTracker() {
   const [medicines, setMedicines] = useState([]);
   const [activeTab, setActiveTab] = useState('home');
   const [showAccountDetails, setShowAccountDetails] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [showSymptomsTracker, setShowSymptomsTracker] = useState(false);
+  
+  // Symptoms tracker state
+  const [symptoms, setSymptoms] = useState([
+    { id: 1, name: 'Fever', checked: false, custom: false },
+    { id: 2, name: 'Tiredness', checked: false, custom: false },
+    { id: 3, name: 'Dry cough', checked: false, custom: false },
+    { id: 4, name: 'Loss of taste or smell', checked: false, custom: false },
+    { id: 5, name: 'Aches and pain', checked: false, custom: false },
+    { id: 6, name: 'Sore throat', checked: false, custom: false },
+    { id: 7, name: 'Conjuctivitis', checked: false, custom: false },
+    { id: 8, name: 'Headache', checked: false, custom: false },
+    { id: 9, name: 'Nausea', checked: false, custom: false },
+    { id: 10, name: 'Diarrhea', checked: false, custom: false },
+    { id: 11, name: 'Shortness of breath', checked: false, custom: false }
+  ]);
+  
+  const [newSymptom, setNewSymptom] = useState('');
+  const [showAddSymptom, setShowAddSymptom] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  
+  // Save symptoms and show toast
+  const saveSymptoms = () => {
+    setShowSuccessToast(true);
+    // Hide toast after 2 seconds
+    setTimeout(() => {
+      setShowSuccessToast(false);
+    }, 2000);
+  };
+  
+  // Toggle symptom
+  const toggleSymptom = (id) => {
+    setSymptoms(prev => prev.map(symptom => 
+      symptom.id === id ? { ...symptom, checked: !symptom.checked } : symptom
+    ));
+  };
+  
+  // Add custom symptom
+  const addCustomSymptom = () => {
+    if (newSymptom.trim()) {
+      const newSymptomObj = {
+        id: Date.now(),
+        name: newSymptom.trim(),
+        checked: false,
+        custom: true
+      };
+      setSymptoms(prev => [...prev, newSymptomObj]);
+      setNewSymptom('');
+      setShowAddSymptom(false);
+    }
+  };
+  
+  // Delete custom symptom
+  const deleteCustomSymptom = (id) => {
+    setSymptoms(prev => prev.filter(symptom => symptom.id !== id));
+  };
   
   // Calendar state
   const [currentDate] = useState(new Date());
@@ -44,6 +145,7 @@ export default function MedicineTracker() {
   // Appointment form state
   const [appointmentForm, setAppointmentForm] = useState({
     type: 'Check Up',
+    doctor: '',
     date: '',
     time: '',
     comments: ''
@@ -58,9 +160,15 @@ export default function MedicineTracker() {
       return;
     }
     
+    if (!appointmentForm.doctor) {
+      alert('Please select a doctor');
+      return;
+    }
+    
     const newAppointment = {
       id: Date.now(),
       type: appointmentForm.type,
+      doctor: appointmentForm.doctor,
       date: appointmentForm.date,
       time: appointmentForm.time,
       comments: appointmentForm.comments
@@ -71,6 +179,7 @@ export default function MedicineTracker() {
     // Reset form
     setAppointmentForm({
       type: 'Check Up',
+      doctor: '',
       date: '',
       time: '',
       comments: ''
@@ -109,11 +218,11 @@ export default function MedicineTracker() {
   
   // Demo user data
   const demoUser = {
-    name: 'John Anderson',
-    dateOfBirth: '15 March 1985',
-    phoneNumber: '+1 (555) 123-4567',
+    name: 'Jasmine Denise',
+    dateOfBirth: '06 November 2004',
+    phoneNumber: '+555 555 5555',
     bloodType: 'O+',
-    city: 'San Francisco, CA'
+    city: 'Laguna, Philippines'
   };
   const [formData, setFormData] = useState({
     name: '',
@@ -602,8 +711,132 @@ export default function MedicineTracker() {
             </div>
           )}
 
+          {/* Symptoms Tracker Page */}
+          {activeTab === 'settings' && showSymptomsTracker && (
+            <div className="p-6">
+              {/* Back Button */}
+              <div className="flex items-center gap-3 mb-6">
+                <button 
+                  onClick={() => setShowSymptomsTracker(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6 text-gray-600" />
+                </button>
+                <h2 className="text-2xl font-bold text-gray-800">Symptoms Tracker</h2>
+              </div>
+
+              {/* Prompt Section */}
+              <div className="bg-white rounded-full p-4 mb-6 shadow-sm flex items-center gap-3 border-2 border-red-600">
+                <span className="text-red-600 font-semibold text-sm flex-1">Tell me what are you feeling...</span>
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <Activity className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+
+              {/* Symptoms List */}
+              <div className="space-y-3 mb-6">
+                {symptoms.map((symptom) => (
+                  <div key={symptom.id} className="relative">
+                    <button
+                      onClick={() => toggleSymptom(symptom.id)}
+                      className={`w-full p-4 rounded-lg font-semibold text-left flex items-center gap-3 transition-all ${
+                        symptom.checked
+                          ? 'bg-red-600 text-white border-2 border-red-600'
+                          : 'bg-white text-red-600 border-2 border-red-600'
+                      }`}
+                    >
+                      <div className={`w-6 h-6 rounded border-2 flex items-center justify-center ${
+                        symptom.checked
+                          ? 'bg-white border-white'
+                          : 'bg-white border-red-600'
+                      }`}>
+                        {symptom.checked && (
+                          <Check className="w-4 h-4 text-red-600" strokeWidth={3} />
+                        )}
+                      </div>
+                      <span className="flex-1">{symptom.name}</span>
+                    </button>
+                    
+                    {/* Delete button for custom symptoms */}
+                    {symptom.custom && (
+                      <button
+                        onClick={() => deleteCustomSymptom(symptom.id)}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-red-700 rounded-full transition-colors"
+                      >
+                        <X className={`w-4 h-4 ${symptom.checked ? 'text-white' : 'text-red-600'}`} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Add Custom Symptom Section */}
+              {showAddSymptom ? (
+                <div className="bg-white rounded-lg p-4 shadow-sm border-2 border-red-600 mb-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Add Custom Symptom
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newSymptom}
+                      onChange={(e) => setNewSymptom(e.target.value)}
+                      placeholder="Enter symptom name..."
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      onKeyPress={(e) => e.key === 'Enter' && addCustomSymptom()}
+                    />
+                    <button
+                      onClick={addCustomSymptom}
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                    >
+                      Add
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAddSymptom(false);
+                        setNewSymptom('');
+                      }}
+                      className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAddSymptom(true)}
+                  className="w-full bg-white text-red-600 border-2 border-red-600 py-4 rounded-lg font-semibold hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  Add Custom Symptom
+                </button>
+              )}
+
+              {/* Save/Download Button */}
+              <button 
+                onClick={saveSymptoms}
+                className="w-full bg-red-600 text-white py-4 rounded-full font-bold text-lg hover:bg-red-700 transition-colors shadow-lg mt-6 flex items-center justify-center gap-2"
+              >
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                  <Check className="w-5 h-5 text-red-600" strokeWidth={3} />
+                </div>
+                Save Symptoms
+              </button>
+            </div>
+          )}
+
+          {/* Success Toast Notification */}
+          {showSuccessToast && (
+            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
+              <div className="bg-green-600 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2">
+                <Check className="w-5 h-5" strokeWidth={3} />
+                <span className="font-semibold">Symptoms saved successfully!</span>
+              </div>
+            </div>
+          )}
+
           {/* Settings Tab */}
-          {activeTab === 'settings' && !showAccountDetails && (
+          {activeTab === 'settings' && !showAccountDetails && !showSymptomsTracker && (
             <div className="p-6">
               <div className="flex items-center gap-2 mb-6">
                 <Settings className="w-8 h-8 text-red-600" />
@@ -621,9 +854,15 @@ export default function MedicineTracker() {
                     <User className="w-5 h-5 text-gray-600" />
                     <span className="text-gray-800 font-medium">Account</span>
                   </button>
-                  <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100">
-                    <Bell className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-800 font-medium">Notifications</span>
+                  <button 
+                    onClick={() => {
+                      setShowSymptomsTracker(true);
+                      setShowAccountDetails(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                  >
+                    <Activity className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Symptoms Tracker</span>
                   </button>
                   <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100">
                     <Gift className="w-5 h-5 text-gray-600" />
@@ -897,6 +1136,26 @@ export default function MedicineTracker() {
                   </select>
                 </div>
 
+                {/* Select Doctor */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Select Doctor *
+                  </label>
+                  <select
+                    value={appointmentForm.doctor}
+                    onChange={(e) => setAppointmentForm(prev => ({ ...prev, doctor: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-800 font-medium"
+                    required
+                  >
+                    <option value="">-- Choose a doctor --</option>
+                    {demoDoctors.map((doctor) => (
+                      <option key={doctor.id} value={doctor.name}>
+                        {doctor.name} - {doctor.specialty}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Date */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -1033,6 +1292,12 @@ export default function MedicineTracker() {
                             </div>
 
                             <div className="space-y-2 text-sm">
+                              {apt.doctor && (
+                                <div className="flex items-center gap-2">
+                                  <User className="w-4 h-4 text-gray-500" />
+                                  <span className="text-gray-700 font-medium">{apt.doctor}</span>
+                                </div>
+                              )}
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-gray-500" />
                                 <span className="text-gray-700 font-medium">
@@ -1065,8 +1330,164 @@ export default function MedicineTracker() {
             </div>
           )}
 
+          {/* User/Doctor Search Tab */}
+          {activeTab === 'user' && !selectedDoctor && (
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <MapPin className="w-8 h-8 text-red-600" />
+                <h2 className="text-2xl font-bold text-gray-800">Find Doctors</h2>
+              </div>
+
+              {/* Map with Real Image */}
+              <div className="bg-white rounded-lg overflow-hidden mb-6 shadow-md relative" style={{ height: '250px' }}>
+                <img 
+                  src="laguna.png" 
+                  alt="Map of Biñan, Laguna"
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* User Location Pin (University of Perpetual Help System Laguna) - Center-right */}
+                <div className="absolute top-[45%] left-[58%] transform -translate-x-1/2 -translate-y-1/2">
+                  <div className="relative">
+                    <MapPin className="w-8 h-8 text-blue-600 fill-blue-400 drop-shadow-lg" strokeWidth={2.5} />
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded shadow-md whitespace-nowrap text-center">
+                      <p className="text-xs font-semibold text-blue-600">You are here</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Doctor Pins - Scattered across Biñan/Laguna area */}
+                
+                {/* Near Central Mall Biñan (upper left) */}
+                <div className="absolute top-[38%] left-[35%]">
+                  <div className="relative group">
+                    <MapPin className="w-6 h-6 text-red-600 fill-red-400 drop-shadow-md animate-pulse cursor-pointer" />
+                  </div>
+                </div>
+                
+                {/* Calamba area (left side) */}
+                <div className="absolute top-[25%] left-[25%]">
+                  <div className="relative group">
+                    <MapPin className="w-6 h-6 text-red-600 fill-red-400 drop-shadow-md animate-pulse cursor-pointer" />
+                  </div>
+                </div>
+                
+                {/* Near Plaza Rizal (upper right) */}
+                <div className="absolute top-[20%] left-[60%]">
+                  <div className="relative group">
+                    <MapPin className="w-6 h-6 text-red-600 fill-red-400 drop-shadow-md animate-pulse cursor-pointer" />
+                  </div>
+                </div>
+                
+                {/* San Pedro/Zapote area (lower left) */}
+                <div className="absolute bottom-[30%] left-[20%]">
+                  <div className="relative group">
+                    <MapPin className="w-6 h-6 text-red-600 fill-red-400 drop-shadow-md animate-pulse cursor-pointer" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Doctor List */}
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Available Doctors</h3>
+              <div className="space-y-3">
+                {demoDoctors.map((doctor) => (
+                  <button
+                    key={doctor.id}
+                    onClick={() => setSelectedDoctor(doctor)}
+                    className="w-full bg-white rounded-lg shadow-sm p-4 border-l-4 border-red-500 hover:shadow-md transition-shadow text-left"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-bold text-gray-800 text-lg">{doctor.name}</h4>
+                        <p className="text-red-600 text-sm font-medium">{doctor.specialty}</p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        <span className="text-sm font-semibold text-gray-700">{doctor.rating}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {doctor.distance}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {doctor.wait}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Doctor Profile View */}
+          {activeTab === 'user' && selectedDoctor && (
+            <div className="p-6">
+              {/* Back Button */}
+              <div className="flex items-center gap-3 mb-6">
+                <button 
+                  onClick={() => setSelectedDoctor(null)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6 text-gray-600" />
+                </button>
+                <h2 className="text-2xl font-bold text-gray-800">Doctor Profile</h2>
+              </div>
+
+              {/* Doctor Profile Card */}
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 mb-6 shadow-md">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-1">{selectedDoctor.name}</h3>
+                    <p className="text-red-600 font-semibold mb-3">{selectedDoctor.specialty}</p>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Clock className="w-4 h-4 text-gray-500" />
+                        <span>Wait time: <strong>{selectedDoctor.wait}</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <MapPin className="w-4 h-4 text-gray-500" />
+                        <span>{selectedDoctor.location} ({selectedDoctor.distance})</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Rating Badge */}
+                  <div className="bg-white rounded-full px-4 py-2 shadow-sm flex items-center gap-1">
+                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                    <span className="font-bold text-gray-800">{selectedDoctor.rating}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* About Section */}
+              <div className="mb-6">
+                <h4 className="text-lg font-bold text-gray-800 mb-3">About</h4>
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <p className="text-gray-700 leading-relaxed">{selectedDoctor.description}</p>
+                </div>
+              </div>
+
+              {/* Book Appointment Button */}
+              <button
+                onClick={() => {
+                  setActiveTab('calendar');
+                  setShowAppointmentForm(true);
+                  setSelectedDoctor(null);
+                }}
+                className="w-full bg-red-600 text-white py-4 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-md flex items-center justify-center gap-2"
+              >
+                <Calendar className="w-5 h-5" />
+                Book Appointment
+              </button>
+            </div>
+          )}
+
           {/* Other Tabs - Placeholder */}
-          {activeTab !== 'home' && activeTab !== 'edit' && activeTab !== 'settings' && activeTab !== 'calendar' && activeTab !== 'bell' && (
+          {activeTab !== 'home' && activeTab !== 'edit' && activeTab !== 'settings' && activeTab !== 'calendar' && activeTab !== 'bell' && activeTab !== 'user' && (
             <div className="p-6 text-center">
               <p className="text-gray-500 text-lg">Coming Soon!</p>
               <p className="text-gray-400 text-sm mt-2">This feature is under development</p>
@@ -1115,7 +1536,7 @@ export default function MedicineTracker() {
                 activeTab === 'edit' ? 'bg-white/20' : 'hover:bg-white/10'
               }`}
             >
-              <Edit className="w-6 h-6 text-white" />
+              <Pill className="w-6 h-6 text-white" />
             </button>
             <button
               onClick={() => setActiveTab('settings')}
@@ -1129,6 +1550,21 @@ export default function MedicineTracker() {
         </div>
               </div>
       )}
+      <style jsx>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -10px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
