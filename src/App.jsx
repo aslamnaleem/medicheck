@@ -1391,7 +1391,7 @@ const medicineDatabase = [
                 />
                 
                 {/* User Location Pin (University of Perpetual Help System Laguna) - Center-right */}
-                <div className="absolute top-[45%] left-[54%] transform -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute top-[42%] left-[48%] transform -translate-x-1/2 -translate-y-1/2">
                   <div className="relative">
                     <MapPin className="w-8 h-8 text-blue-600 fill-blue-400 drop-shadow-lg" strokeWidth={2.5} />
                     <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded shadow-md whitespace-nowrap text-center">
