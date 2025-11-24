@@ -1,5 +1,109 @@
 import React, { useState } from 'react';
-import { Pill, Info, Clock, User, Calendar, Bell, Edit, Settings, Check, Gift, LogOut, Trash2, AlertTriangle, Send, ChevronLeft, Phone, MapPin, Droplet, Cake, Star, Activity, Plus, X } from 'lucide-react';
+import { Pill, Info, Clock, User, Calendar, Bell, Edit, Settings, Check, Gift, LogOut, Trash2, AlertTriangle, Send, ChevronLeft, Phone, MapPin, Droplet, Cake, Star, Activity, Plus, X, BookOpen, Search, Mic } from 'lucide-react';
+
+// Medicine dictionary data
+const medicineDictionary = [
+  {
+    id: 1,
+    name: 'Paracetamol',
+    category: 'Analgesic & Antipyretic',
+    purpose: 'Purpose: Analgesic (pain relief) and Antipyretic (fever reducer).',
+    indication: 'Indication: Mild to moderate pain, fever',
+    constraindications: 'Contra: Severe liver impairment allergy',
+    effects: 'Side Effects: Generally well-tolerated; large doses can cause liver damage (hepatotoxicity).',
+    dose: 'Dose: 325 mg to 1000 mg every 4–6 hours (max 4000 mg/day).'
+  },
+  {
+    id: 2,
+    name: 'Amoxicillin',
+    category: 'Antibiotic',
+    purpose: 'Purpose: NSAID (at high doses); Antiplatelet (at low doses).',
+    indication: 'Indication: Pain, fever, inflammation; prevention of heart attack/stroke (low dose).',
+    constraindications: 'Contra: Children (Reyes syndrome risk), active GI bleed, allergy to NSAIDs.',
+    effects: 'Side Effects: Bleeding, GI ulcers, tinnitus (ringing in ears).',
+    dose: 'Dose: 81 mg/day (cardiac); 325–650 mg every 4–6 hours (pain/fever).'
+  },
+  {
+    id: 3,
+    name: 'Metformin',
+    category: 'Antidiabetic',
+    purpose: 'Purpose: Biguanide; lowers blood glucose production by the liver.',
+    indication: 'Indication: Type 2 Diabetes Mellitus.',
+    constraindications: 'Contra: Severe kidney impairment, metabolic acidosis, congestive heart failure requiring medication.',
+    effects: 'Side Effects: Diarrhea, nausea, vomiting, abdominal discomfort; Lactic Acidosis (rare but serious).',
+    dose: 'Dose: 500 mg to 1000 mg one to three times daily.'
+  },
+  {
+    id: 4,
+    name: 'Amlodipine',
+    category: 'Antihypertensive',
+    purpose: 'Purpose: Calcium Channel Blocker (CCB).',
+    indication: 'Indication: Hypertension (high blood pressure), Chronic stable angina (chest pain).',
+    constraindications: 'Contra: Severe hypotension, cardiogenic shock.',
+    effects: 'Effects: Edema (swelling, especially in ankles), headache, fatigue, flushing.',
+    dose: 'Dose: 2.5 mg to 10 mg once daily.'
+  },
+  {
+    id: 5,
+    name: 'Ibuprofen',
+    category: 'Anti-inflammatory',
+    purpose: 'Purpose: Nonsteroidal Anti-Inflammatory Drug (NSAID). Analgesic, Anti-inflammatory, Antipyretic.',
+    indication: 'Indication: Mild to moderate pain, inflammation (arthritis), fever.',
+    constraindications: 'Contra: GI bleeding/ulcers, severe heart failure, third-trimester pregnancy.',
+    effects: 'Side Effects: GI upset/ulcers, dizziness, fluid retention, increased risk of heart attack/stroke.',
+    dose: 'Dose: 200 mg to 800 mg every 4–8 hours.'
+  },
+  {
+    id: 6,
+    name: 'Omeprazole',
+    category: 'Proton Pump Inhibitor',
+    purpose: 'Purpose: Proton Pump Inhibitor (PPI).',
+    indication: 'Indication: Gastroesophageal Reflux Disease (GERD), ulcers, erosive esophagitis.',
+    constraindications: 'Contra: Hypersensitivity.',
+    effects: 'Side Effects: Headache, diarrhea, nausea, long-term use linked to risk of bone fracture, low magnesium.',
+    dose: 'Dose: 20 mg to 40 mg once daily.'
+  },
+  {
+    id: 7,
+    name: 'Aspirin',
+    category: 'Antiplatelet',
+    purpose: 'Purpose: NSAID (at high doses); Antiplatelet (at low doses).',
+    indication: 'Indication: Pain, fever, inflammation; prevention of heart attack/stroke (low dose).',
+    constraindications: 'Contra: Children (Reyes syndrome risk), active GI bleed, allergy to NSAIDs.',
+    effects: 'Side Effects: Bleeding, GI ulcers, tinnitus (ringing in ears).',
+    dose: 'Dose: 81 mg/day (cardiac); 325–650 mg every 4–6 hours (pain/fever).'
+  },
+  {
+    id: 8,
+    name: 'Cetirizine',
+    category: 'Antihistamine',
+    purpose: 'Purpose: Second-generation Antihistamine.',
+    indication: 'Indication: Allergic rhinitis (hay fever), chronic urticaria (hives).',
+    constraindications: 'Contra: Hypersensitivity, severe kidney impairment.',
+    effects: 'Side Effects: Drowsiness (less than first-generation), fatigue, dry mouth.',
+    dose: 'Dose: 5 mg to 10 mg once daily.'
+  },
+  {
+    id: 9,
+    name: 'Losartan',
+    category: 'Antihypertensive',
+    purpose: 'Purpose: Angiotensin II Receptor Blocker (ARB).',
+    indication: 'Indication: Hypertension, stroke risk reduction in hypertensive patients with left ventricular hypertrophy.',
+    constraindications: 'Contra: Pregnancy (can cause fetal harm), hypersensitivity.',
+    effects: 'Side Effects: Dizziness, upper respiratory infection, angioedema (swelling of face/throat).',
+    dose: 'Dose: 25 mg to 100 mg once daily.'
+  },
+  {
+    id: 10,
+    name: 'Atorvastatin',
+    category: 'Statin',
+    purpose: 'Purpose: HMG-CoA Reductase Inhibitor (Statin).',
+    indication: 'Indication: Hypercholesterolemia (high cholesterol), prevention of cardiovascular events.',
+    constraindications: 'Contra: Active liver disease, pregnancy/breastfeeding.',
+    effects: 'Side Effects: Muscle pain (myalgia), headache, joint pain, rare risk of liver damage or muscle breakdown (Rhabdomyolysis).',
+    dose: 'Dose: 10 mg to 80 mg once daily.'
+  }
+];
 
 // Demo doctors data
 const demoDoctors = [
@@ -80,6 +184,8 @@ export default function MedicineTracker() {
   const [showAccountDetails, setShowAccountDetails] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [showSymptomsTracker, setShowSymptomsTracker] = useState(false);
+  const [showMedicineDictionary, setShowMedicineDictionary] = useState(false);
+  const [medicineSearchTerm, setMedicineSearchTerm] = useState('');
   
   // Symptoms tracker state
   const [symptoms, setSymptoms] = useState([
@@ -220,7 +326,7 @@ export default function MedicineTracker() {
   const demoUser = {
     name: 'Jasmine Denise',
     dateOfBirth: '06 November 2004',
-    phoneNumber: '+555 555 5555',
+    phoneNumber: '+55 555 5555',
     bloodType: 'O+',
     city: 'Laguna, Philippines'
   };
@@ -282,7 +388,7 @@ export default function MedicineTracker() {
     'Ethinyl Estradiol/Norethindrone', 'Conjugated Estrogen', 'Prednisone',
     'Methylprednisolone', 'Alendronate', 'Folic Acid', 'Ergocalciferol',
     'Potassium Chloride', 'Ferrous Sulfate', 'Finasteride', 'Tamsulosin'
-];
+  ];
   
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -410,7 +516,7 @@ export default function MedicineTracker() {
                 <div className="h-1 w-12 bg-white rounded-full"></div>
               </div>
               <p className="text-white text-sm mt-4 font-light tracking-wide opacity-90">
-                Your Personal Medicine Tracker
+                Your Personal Health Companion
               </p>
             </div>
 
@@ -468,7 +574,7 @@ export default function MedicineTracker() {
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden" style={{ minHeight: '600px', maxHeight: '90vh' }}>
         {/* Header */}
         <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-6">
-          <h1 className="text-2xl font-bold tracking-wide">MEDICINE TRACKER</h1>
+          <h1 className="text-2xl font-bold tracking-wide">MEDICHECK HEALTH</h1>
         </div>
 
         {/* Content Area */}
@@ -879,8 +985,90 @@ export default function MedicineTracker() {
             </div>
           )}
 
+          {/* Medicine Dictionary Page */}
+          {activeTab === 'settings' && showMedicineDictionary && (
+            <div className="p-6">
+              {/* Back Button */}
+              <div className="flex items-center gap-3 mb-6">
+                <button 
+                  onClick={() => setShowMedicineDictionary(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6 text-gray-600" />
+                </button>
+                <h2 className="text-2xl font-bold text-gray-800">Medicine Dictionary</h2>
+              </div>
+
+              {/* Search Bar */}
+              <div className="bg-white rounded-full p-3 mb-6 shadow-sm flex items-center gap-3 border-2 border-gray-200">
+                <Search className="w-5 h-5 text-red-600 ml-2" />
+                <input
+                  type="text"
+                  value={medicineSearchTerm}
+                  onChange={(e) => setMedicineSearchTerm(e.target.value)}
+                  placeholder="Search Medicine"
+                  className="flex-1 outline-none text-red-600 placeholder-red-400 font-semibold"
+                />
+                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <Mic className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Medicine List */}
+              <div className="space-y-4">
+                {medicineDictionary
+                  .filter(med => 
+                    medicineSearchTerm === '' || 
+                    med.name.toLowerCase().includes(medicineSearchTerm.toLowerCase()) ||
+                    med.category.toLowerCase().includes(medicineSearchTerm.toLowerCase())
+                  )
+                  .map((medicine) => (
+                    <div 
+                      key={medicine.id}
+                      className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-600"
+                    >
+                      <h3 className="text-lg font-bold text-red-600 mb-1">
+                        {medicine.name}
+                      </h3>
+                      <p className="text-red-500 text-sm font-semibold italic mb-2">
+                        {medicine.category}
+                      </p>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {medicine.purpose}
+                      </p>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {medicine.indication}
+                      </p>
+                     <p className="text-gray-600 text-sm leading-relaxed">
+                        {medicine.constraindications}
+                      </p>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {medicine.effects}
+                      </p>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {medicine.dose}
+                      </p>
+                    </div>
+                  ))}
+                
+                {/* No results message */}
+                {medicineSearchTerm !== '' && 
+                 medicineDictionary.filter(med => 
+                   med.name.toLowerCase().includes(medicineSearchTerm.toLowerCase()) ||
+                   med.category.toLowerCase().includes(medicineSearchTerm.toLowerCase())
+                 ).length === 0 && (
+                  <div className="text-center py-12">
+                    <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 text-lg">No medicines found</p>
+                    <p className="text-gray-400 text-sm mt-2">Try searching with a different term</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Settings Tab */}
-          {activeTab === 'settings' && !showAccountDetails && !showSymptomsTracker && (
+          {activeTab === 'settings' && !showAccountDetails && !showSymptomsTracker && !showMedicineDictionary && (
             <div className="p-6">
               <div className="flex items-center gap-2 mb-6">
                 <Settings className="w-8 h-8 text-red-600" />
@@ -902,15 +1090,23 @@ export default function MedicineTracker() {
                     onClick={() => {
                       setShowSymptomsTracker(true);
                       setShowAccountDetails(false);
+                      setShowMedicineDictionary(false);
                     }}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
                   >
                     <Activity className="w-5 h-5 text-gray-600" />
                     <span className="text-gray-800 font-medium">Symptoms Tracker</span>
                   </button>
-                  <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100">
-                    <Gift className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-800 font-medium">Coupons</span>
+                  <button 
+                    onClick={() => {
+                      setShowMedicineDictionary(true);
+                      setShowAccountDetails(false);
+                      setShowSymptomsTracker(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                  >
+                    <BookOpen className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Medicine Dictionary</span>
                   </button>
                   <button 
                     onClick={handleLogout}
