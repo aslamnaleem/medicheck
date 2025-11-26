@@ -740,7 +740,7 @@ export default function MedicineTracker() {
                       <Bell className="w-5 h-5 text-red-600 mt-1" />
                       <div>
                         <p className="font-semibold text-gray-800 mb-1">New Appointment Request</p>
-                        <p className="text-sm text-gray-600">Patient John Doe requested an appointment for tomorrow at 2:00 PM</p>
+                        <p className="text-sm text-gray-600">Patient Alpavet requested an appointment for tomorrow at 2:00 PM</p>
                         <p className="text-xs text-gray-500 mt-2">2 hours ago</p>
                       </div>
                     </div>
@@ -751,7 +751,7 @@ export default function MedicineTracker() {
                       <Info className="w-5 h-5 text-blue-600 mt-1" />
                       <div>
                         <p className="font-semibold text-gray-800 mb-1">Lab Results Available</p>
-                        <p className="text-sm text-gray-600">Blood test results for patient Maria Santos are ready for review</p>
+                        <p className="text-sm text-gray-600">Blood test results for patient Crinnie are ready for review</p>
                         <p className="text-xs text-gray-500 mt-2">5 hours ago</p>
                       </div>
                     </div>
@@ -773,7 +773,7 @@ export default function MedicineTracker() {
                       <Check className="w-5 h-5 text-green-600 mt-1" />
                       <div>
                         <p className="font-semibold text-gray-800 mb-1">Appointment Confirmed</p>
-                        <p className="text-sm text-gray-600">Patient confirmed their appointment for Nov 28, 10:00 AM</p>
+                        <p className="text-sm text-gray-600">Patient Keilene confirmed their appointment for Nov 28, 10:00 AM</p>
                         <p className="text-xs text-gray-500 mt-2">2 days ago</p>
                       </div>
                     </div>
