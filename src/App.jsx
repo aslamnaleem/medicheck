@@ -152,6 +152,8 @@ const demoDoctors = [
 export default function MedicineTracker() {
   // Authentication state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isDoctorLoggedIn, setIsDoctorLoggedIn] = useState(false);
+  const [showDoctorLogin, setShowDoctorLogin] = useState(false);
   const [loginForm, setLoginForm] = useState({
     username: '',
     password: ''
@@ -169,6 +171,27 @@ export default function MedicineTracker() {
       setLoginError('Invalid username or password');
       setLoginForm({ username: '', password: '' });
     }
+  };
+  
+  // Handle doctor login
+  const handleDoctorLogin = (e) => {
+    e.preventDefault();
+    
+    if (loginForm.username === 'jasmine' && loginForm.password === 'zabala') {
+      setIsDoctorLoggedIn(true);
+      setLoginError('');
+    } else {
+      setLoginError('Invalid username or password');
+      setLoginForm({ username: '', password: '' });
+    }
+  };
+  
+  // Doctor logout
+  const handleDoctorLogout = () => {
+    setIsDoctorLoggedIn(false);
+    setShowDoctorLogin(false);
+    setActiveTab('home');
+    setLoginForm({ username: '', password: '' });
   };
   
   // Handle logout
@@ -501,21 +524,21 @@ export default function MedicineTracker() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-600 to-red-700 flex items-center justify-center p-4">
-      {!isLoggedIn ? (
-        /* Login Page */
+      {!isLoggedIn && !isDoctorLoggedIn && !showDoctorLogin ? (
+        /* Main Login Page */
         <div className="w-full max-w-md bg-gradient-to-b from-red-600 to-red-700 rounded-3xl shadow-2xl overflow-hidden p-8" style={{ minHeight: '600px' }}>
           <div className="flex flex-col items-center justify-center h-full">
             {/* Logo - MediCheck Text */}
-            <div className="mb-12 text-center">
-              <h1 className="text-6xl font-black text-white mb-2 tracking-tight">
-                Medi<span className="text-red-200">Check</span>
+            <div className="mb-8 text-center">
+              <h1 className="text-5xl font-black text-white mb-4 tracking-tight">
+                MediCheck
               </h1>
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <div className="h-1 w-12 bg-white rounded-full"></div>
-                <Pill className="w-6 h-6 text-white" />
-                <div className="h-1 w-12 bg-white rounded-full"></div>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="h-0.5 w-16 bg-white"></div>
+                <Pill className="w-8 h-8 text-white" strokeWidth={2.5} />
+                <div className="h-0.5 w-16 bg-white"></div>
               </div>
-              <p className="text-white text-sm mt-4 font-light tracking-wide opacity-90">
+              <p className="text-white text-sm font-light tracking-wide opacity-90">
                 Your Personal Health Companion
               </p>
             </div>
@@ -529,7 +552,7 @@ export default function MedicineTracker() {
                   value={loginForm.username}
                   onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
                   placeholder="Username"
-                  className="w-full px-6 py-4 rounded-full text-gray-700 font-medium focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+                  className="w-full px-6 py-4 rounded-full text-gray-700 placeholder-gray-400 font-medium focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
                   required
                 />
               </div>
@@ -541,7 +564,7 @@ export default function MedicineTracker() {
                   value={loginForm.password}
                   onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
                   placeholder="Password"
-                  className="w-full px-6 py-4 rounded-full text-gray-700 font-medium focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+                  className="w-full px-6 py-4 rounded-full text-gray-700 placeholder-gray-400 font-medium focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
                   required
                 />
               </div>
@@ -562,10 +585,317 @@ export default function MedicineTracker() {
               </button>
             </form>
 
-            {/* Demo Info */}
-            <div className="mt-8 text-center">
-              <p className="text-white text-xs opacity-75">Demo Credentials:</p>
-              <p className="text-white text-xs font-semibold">Username: jasmine | Password: denise</p>
+            {/* Demo Credentials */}
+            <div className="mt-6 text-center">
+              <p className="text-white text-xs font-semibold mb-1">Demo Credentials:</p>
+              <p className="text-white text-xs opacity-90">Username: jasmine | Password: denise</p>
+            </div>
+
+            {/* Additional Login Buttons */}
+            <div className="mt-8 w-full flex gap-3">
+              <button 
+                onClick={() => setShowDoctorLogin(true)}
+                type="button"
+                className="flex-1 bg-white text-red-600 py-3 rounded-full font-bold text-sm hover:bg-gray-100 transition-colors shadow-md"
+              >
+                Doctor Login
+              </button>
+              <button 
+                type="button"
+                className="flex-1 bg-white text-red-600 py-3 rounded-full font-bold text-sm hover:bg-gray-100 transition-colors shadow-md"
+              >
+                Medical Centre Login
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : isDoctorLoggedIn ? (
+        /* Doctor Interface */
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden" style={{ minHeight: '600px', maxHeight: '90vh' }}>
+          {/* Header */}
+          <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-6">
+            <h1 className="text-2xl font-bold tracking-wide">Upcoming Appointments</h1>
+          </div>
+
+          {/* Content Area */}
+          <div className="overflow-y-auto" style={{ height: 'calc(90vh - 180px)', maxHeight: '500px' }}>
+            {activeTab === 'home' && (
+              <div className="p-6">
+                {/* Appointments List */}
+                {appointments.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 text-lg">No upcoming appointments</p>
+                    <p className="text-gray-400 text-sm mt-2">Appointments will appear here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {appointments.map((apt) => (
+                      <div
+                        key={apt.id}
+                        className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-500"
+                      >
+                        <div className="flex items-start gap-3">
+                          {/* Circle Checkbox */}
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 mt-1"></div>
+                          
+                          {/* Appointment Details */}
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-800 mb-2">
+                              {apt.type}
+                            </h3>
+                            
+                            {apt.doctor && (
+                              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                                <User className="w-4 h-4" />
+                                <span>{apt.doctor}</span>
+                              </div>
+                            )}
+                            
+                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                              <Calendar className="w-4 h-4" />
+                              <span>
+                                {new Date(apt.date).toLocaleDateString('en-US', { 
+                                  weekday: 'long',
+                                  month: 'long',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Clock className="w-4 h-4" />
+                              <span>{apt.time}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Doctor Calendar View */}
+            {activeTab === 'calendar' && (
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Calendar className="w-8 h-8 text-red-600" />
+                  <h2 className="text-2xl font-bold text-gray-800">Schedule</h2>
+                </div>
+
+                {/* Calendar Placeholder */}
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 mb-6 text-center">
+                  <Calendar className="w-16 h-16 text-red-600 mx-auto mb-4" />
+                  <p className="text-gray-700 font-semibold text-lg mb-2">Calendar View</p>
+                  <p className="text-gray-500 text-sm">Your weekly schedule and appointments</p>
+                </div>
+
+                {/* Today's Schedule */}
+                <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-600 mb-4">
+                  <h3 className="font-bold text-gray-800 mb-3">Today's Schedule</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between py-2 border-b">
+                      <span className="text-gray-600">09:00 - 10:00</span>
+                      <span className="text-gray-800 font-medium">Patient Consultation</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b">
+                      <span className="text-gray-600">10:30 - 11:00</span>
+                      <span className="text-gray-800 font-medium">Follow-up Review</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-gray-600">14:00 - 15:00</span>
+                      <span className="text-gray-800 font-medium">Lab Results Review</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Statistics */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-red-50 rounded-lg p-4 text-center">
+                    <p className="text-3xl font-bold text-red-600 mb-1">{appointments.length}</p>
+                    <p className="text-sm text-gray-600">Pending</p>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-4 text-center">
+                    <p className="text-3xl font-bold text-green-600 mb-1">12</p>
+                    <p className="text-sm text-gray-600">Completed</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Doctor Notifications View */}
+            {activeTab === 'bell' && (
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Bell className="w-8 h-8 text-red-600" />
+                  <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
+                </div>
+
+                {/* Notifications List */}
+                <div className="space-y-3">
+                  <div className="bg-red-50 rounded-lg p-4 border-l-4 border-red-600">
+                    <div className="flex items-start gap-3">
+                      <Bell className="w-5 h-5 text-red-600 mt-1" />
+                      <div>
+                        <p className="font-semibold text-gray-800 mb-1">New Appointment Request</p>
+                        <p className="text-sm text-gray-600">Patient John Doe requested an appointment for tomorrow at 2:00 PM</p>
+                        <p className="text-xs text-gray-500 mt-2">2 hours ago</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-600">
+                    <div className="flex items-start gap-3">
+                      <Info className="w-5 h-5 text-blue-600 mt-1" />
+                      <div>
+                        <p className="font-semibold text-gray-800 mb-1">Lab Results Available</p>
+                        <p className="text-sm text-gray-600">Blood test results for patient Maria Santos are ready for review</p>
+                        <p className="text-xs text-gray-500 mt-2">5 hours ago</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-600">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-orange-600 mt-1" />
+                      <div>
+                        <p className="font-semibold text-gray-800 mb-1">Appointment Reminder</p>
+                        <p className="text-sm text-gray-600">You have 3 appointments scheduled for tomorrow</p>
+                        <p className="text-xs text-gray-500 mt-2">1 day ago</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-600">
+                    <div className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-600 mt-1" />
+                      <div>
+                        <p className="font-semibold text-gray-800 mb-1">Appointment Confirmed</p>
+                        <p className="text-sm text-gray-600">Patient confirmed their appointment for Nov 28, 10:00 AM</p>
+                        <p className="text-xs text-gray-500 mt-2">2 days ago</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Navigation - Doctor View (Simplified) */}
+          <div className="bg-gradient-to-r from-red-600 to-red-700 p-4">
+            <div className="flex justify-around items-center">
+              <button
+                onClick={() => setActiveTab('home')}
+                className={`p-3 rounded-full transition-colors ${
+                  activeTab === 'home' ? 'bg-white/20' : 'hover:bg-white/10'
+                }`}
+              >
+                <Clock className="w-6 h-6 text-white" />
+              </button>
+              <button
+                onClick={() => setActiveTab('calendar')}
+                className={`p-3 rounded-full transition-colors ${
+                  activeTab === 'calendar' ? 'bg-white/20' : 'hover:bg-white/10'
+                }`}
+              >
+                <Calendar className="w-6 h-6 text-white" />
+              </button>
+              <button
+                onClick={() => setActiveTab('bell')}
+                className={`p-3 rounded-full transition-colors ${
+                  activeTab === 'bell' ? 'bg-white/20' : 'hover:bg-white/10'
+                }`}
+              >
+                <Bell className="w-6 h-6 text-white" />
+              </button>
+              <button
+                onClick={handleDoctorLogout}
+                className="p-3 rounded-full transition-colors hover:bg-white/10"
+              >
+                <Settings className="w-6 h-6 text-white" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : !isLoggedIn && showDoctorLogin ? (
+        /* Doctor Login Page */
+        <div className="w-full max-w-md bg-gradient-to-b from-red-600 to-red-700 rounded-3xl shadow-2xl overflow-hidden p-8" style={{ minHeight: '600px' }}>
+          <div className="flex flex-col items-center justify-center h-full">
+            {/* Back Button */}
+            <button 
+              onClick={() => {
+                setShowDoctorLogin(false);
+                setLoginError('');
+                setLoginForm({ username: '', password: '' });
+              }}
+              className="self-start mb-4 p-2 hover:bg-white/10 rounded-full transition-colors"
+            >
+              <ChevronLeft className="w-6 h-6 text-white" />
+            </button>
+
+            {/* Logo - MediCheck Text */}
+            <div className="mb-8 text-center">
+              <h1 className="text-5xl font-black text-white mb-4 tracking-tight">
+                MediCheck
+              </h1>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="h-0.5 w-16 bg-white"></div>
+                <User className="w-8 h-8 text-white" strokeWidth={2.5} />
+                <div className="h-0.5 w-16 bg-white"></div>
+              </div>
+              <p className="text-white text-lg font-semibold tracking-wide">
+                Doctor Login
+              </p>
+            </div>
+
+            {/* Doctor Login Form */}
+            <form onSubmit={handleDoctorLogin} className="w-full space-y-4">
+              {/* Username */}
+              <div>
+                <input
+                  type="text"
+                  value={loginForm.username}
+                  onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                  placeholder="Username"
+                  className="w-full px-6 py-4 rounded-full text-gray-700 placeholder-gray-400 font-medium focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+                  required
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <input
+                  type="password"
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Password"
+                  className="w-full px-6 py-4 rounded-full text-gray-700 placeholder-gray-400 font-medium focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50"
+                  required
+                />
+              </div>
+
+              {/* Error Message */}
+              {loginError && (
+                <div className="text-white text-center text-sm font-semibold bg-red-800 bg-opacity-50 py-2 rounded-full">
+                  {loginError}
+                </div>
+              )}
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                className="w-full bg-white text-red-600 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg"
+              >
+                Login as Doctor
+              </button>
+            </form>
+
+            {/* Demo Credentials */}
+            <div className="mt-6 text-center">
+              <p className="text-white text-xs font-semibold mb-1">Demo Credentials:</p>
+              <p className="text-white text-xs opacity-90">Username: jasmine | Password: zabala</p>
             </div>
           </div>
         </div>
