@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, Info, Clock, User, Calendar, Bell, Edit, Settings, Check, Gift, LogOut, Trash2, AlertTriangle, Send, ChevronLeft, Phone, MapPin, Droplet, Cake, Star, Activity, Plus, X, BookOpen, Search, Mic } from 'lucide-react';
+import { Pill, Info, Clock, User, Calendar, Bell, Edit, Settings, Check, Gift, LogOut, Trash2, AlertTriangle, Send, ChevronLeft, Phone, MapPin, Droplet, Cake, Star, Activity, Plus, X, BookOpen, Search, Mic, Languages } from 'lucide-react';
 
 // Medicine dictionary data
 const medicineDictionary = [
@@ -110,7 +110,7 @@ const demoDoctors = [
   {
     id: 1,
     name: 'Dr. Jasmine Dela Cruz',
-    specialty: 'Pediatrician',
+    specialty: 'Pediatrician (License: 2838539101)',
     location: 'San Vicente, Biñan, Laguna',
     distance: '2 KM',
     wait: '10 Mins',
@@ -120,7 +120,7 @@ const demoDoctors = [
   {
     id: 2,
     name: 'Dr. Denise Smith',
-    specialty: 'Endocrinologist',
+    specialty: 'Endocrinologist (License: 11295739204)',
     location: 'Orchid Street, Biñan, Laguna',
     distance: '5 KM',
     wait: '20 Mins',
@@ -130,7 +130,7 @@ const demoDoctors = [
   {
     id: 3,
     name: 'Dr. Zambas Santos',
-    specialty: 'Cardiologist',
+    specialty: 'Cardiologist (License: 14846194994)',
     location: 'Tubigan Road, Biñan, Laguna',
     distance: '4 KM',
     wait: '17 Mins',
@@ -140,7 +140,7 @@ const demoDoctors = [
   {
     id: 4,
     name: 'Dr. Zabala Torres',
-    specialty: 'General Practitioner',
+    specialty: 'General Practitioner (License: 1384448201)',
     location: 'Santo Tomas, Biñan, Laguna',
     distance: '6 KM',
     wait: '28 Mins',
@@ -1463,6 +1463,10 @@ export default function MedicineTracker() {
                   <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
                     <Send className="w-5 h-5 text-gray-600" />
                     <span className="text-gray-800 font-medium">Send feedback</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                    <Languages className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Switch to Filipino</span>
                   </button>
                 </div>
               </div>
